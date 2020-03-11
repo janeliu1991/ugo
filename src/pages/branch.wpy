@@ -1,0 +1,42 @@
+<template>
+  <view>
+    <block wx:for="{{goodsList}}" wx:key="index">
+      <van-card
+        num="{{item.goods_number}}"
+        price="{{item.goods_price}}"
+        title="{{item.goods_name}}"
+        thumb="{{item.goods_small_logo}}" @tap="goGoodDetail({{item.goods_id}})"
+      />
+      <view class="spe_line"></view>
+      <view class="spe_line"></view>
+    </block>
+    <view class="over_line" hidden="{{!isOver}}">------我是有底线的------</view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+import mix from '@/mixins/goods_list.js'
+export default class extends wepy.page {
+  mixins = [mix]
+  // config节点只能写到页面的js中，不能抽离到mixin中
+  config = {
+    navigationBarTitleText: '商品列表',
+    onReachBottomDistance: 50,
+    // 开启下拉刷新
+    enablePullDownRefresh: true,
+    backgroundColor: '#eee'
+  }
+}
+</script>
+<style lang="less">
+.spe_line {
+  border-bottom: 1px solid #eee;
+}
+.over_line {
+  text-align: center;
+  font-size: 24rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  color: #ddd;
+}
+</style>
