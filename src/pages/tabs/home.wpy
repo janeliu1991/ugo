@@ -1,0 +1,90 @@
+<template>
+  <view>
+    <!-- 轮播图区域 -->
+    <swiper
+      indicator-dots="{{indicatorDots}}"
+      autoplay="{{autoplay}}"
+      interval="{{interval}}"
+      duration="{{duration}}"
+      circular="{{circular}}"
+    >
+      <swiper-item wx:for="{{swiperList}}" wx:key="index">
+        <navigator url="{{item.navigator_url}}" open-type="{{item.open_type}}">
+          <image src="{{item.image_src}}"/>
+        </navigator>
+      </swiper-item>
+    </swiper>
+
+    <!-- 分类区域 -->
+    <view class="cates">
+      <block wx:for='{{cateList}}' wx:key="index">
+        <navigator url="/pages/tabs/category"   open-type="{{item.open_type}}"  wx:if="item.navigator_url !==undefine"   hover-class="none">
+          <image src="{{item.image_src}}"/>
+        </navigator>
+        <image src="{{item.image_src}}" wx:else/>
+      </block>
+    </view>
+
+    <!-- 楼层区 -->
+    <view class="floor-container">
+      <view class="floor-item" wx:for="{{floorList}}" wx:key="index">
+          <image class="floor-item-title" src="{{item.floor_title.image_src}}"/>
+          <view class="floor-img-box">
+            <image class="img-box-pic" wx:for="{{item.product_list}}" wx:key="index" src="{{item.image_src}}" style="width:{{item.image_width}}rpx" @tap="getGoodsList({{item.navigator_url}})/">
+          </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+// 先导入外界的mixin文件并接收
+// @代表src这一层的路径
+import mix from '@/mixins/tabs/home.js'
+
+export default class extends wepy.page {
+  // 把导入的mix挂载到mixins这个数据中心
+  mixins=[mix]
+}
+</script>
+<style lang="less">
+  .swiper {
+        height:350rpx;
+        image{
+            height: 100%;
+            width: 750rpx;
+        }
+    }
+    .cates {
+      display: flex;
+      justify-content: space-around;
+      margin: 30rpx 0;
+      image {
+        width:128rpx;
+        height:140rpx;
+      }
+    }
+    .floor-container{
+      .floor-item {
+        .floor-item-title{
+          padding-top:10rpx;
+          height: 50rpx;
+          width: 640rpx;
+          display: block;
+        }
+      }
+      .floor-img-box{
+        .img-box-pic{
+          float: left;
+          height: 190rpx;
+          margin: 8rpx;
+          margin-top:0;
+          &:nth-child(1){
+            height: 390rpx;
+          }
+        }
+      }
+    }
+    
+</style>

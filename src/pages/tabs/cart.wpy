@@ -1,0 +1,125 @@
+<template>
+  <view>
+    <view class="empty_cart" wx:if="{{isEmpty}}">
+      <image src="/assets/images/cart_empty@2x.png"/>
+      <view>哎哟，购物车是空的~~</view>
+    </view>
+    <view class="cart_container" wx:else>
+      <!-- 购物车标题 -->
+      <van-cell title="购物车列表" icon="shop-o"/>
+      <!-- 购物车列表 -->
+      <block wx:for="{{cartData}}" wx:key="goods_id">
+        <van-swipe-cell right-width="{{ 65 }}" left-width="{{ 0.1 }}">
+          <van-card title="{{item.goods_name}}" class="item_card">
+            <!-- 自定义描述区域 -->
+            <view slot="desc" class="item_desc">
+              <!-- 价格区域 -->
+              <text class="item_price">￥{{item.goods_price}}</text>
+              <!-- 数量区域 -->
+              <view class="item_acount">
+                <van-stepper
+                  value="{{item.goods_acount}}"
+                  integer
+                  min="1"
+                  data-id="{{item.goods_id}}"
+                  bind:change="onChangeCount"
+                />
+              </view>
+            </view>
+            <!-- 自定义商品的选中状态区域 -->
+            <view class="item_ischecked" slot="thumb">
+              <van-checkbox
+                checked-color="#d81e06"
+                value="{{ item.isChecked }}"
+                bind:change="onChangeChecked"
+                data-id="{{item.goods_id}}"
+              ></van-checkbox>
+              <image src="{{item.goods_pic}}" class="ischecked_img"/>
+            </view>
+          </van-card>
+          <view slot="right" class="delete" @tap="deleteGoods({{item.goods_id}})">删除</view>
+        </van-swipe-cell>
+      </block>
+      <!-- 提交订单区域 -->
+      <van-submit-bar
+        price="{{ totalPrice }}"
+        button-text="提交订单"
+        bind:submit="onSubmitOrder"
+        tip="{{false}}"
+        >
+       <van-checkbox value="{{isCheckedAll}}" checked-color="#d81e06" class="fullCheck" bind:change="changeCheckedAll">全选</van-checkbox>
+        <!-- <view slot="tip" class="">
+    您的收货地址不支持同城送, <text>修改地址</text>
+        </view>-->
+      </van-submit-bar>
+    </view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+import mix from '@/mixins/tabs/cart.js'
+export default class extends wepy.page {
+  mixins = [mix]
+}
+</script>
+<style lang="less">
+.empty_cart {
+  font-size: 26rpx;
+  color: #666;
+  text-align: center;
+  padding-top: 200rpx;
+  image {
+    width: 180rpx;
+    height: 180rpx;
+  }
+  view {
+    margin-top: 15rpx;
+  }
+}
+.cart_container {
+  padding-bottom: 50px;
+  .van-card {
+    border-bottom: 1rpx solid #eee;
+  }
+  .van-card__title {
+    font-weight: 400;
+  }
+  .item_card {
+    position: relative;
+    .item_desc {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      .item_price {
+        font-size: 30rpx;
+        color: red;
+      }
+    }
+    .item_ischecked {
+      display: flex;
+      align-items: center;
+      .ischecked_img {
+        width: 180rpx!important;
+        height: 180rpx;
+        margin-left: 16rpx;
+      }
+    }
+  }
+  .delete {
+    background-color: #ff4444;
+    width: 65px;
+    height: 100%;
+    color: white;
+    font-size: 26rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+.fullCheck {
+  margin-left: 20rpx;
+}
+</style>

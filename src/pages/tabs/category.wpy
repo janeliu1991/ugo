@@ -1,0 +1,62 @@
+<template>
+  <view class="cates-container">
+    <!-- 左侧一级分类区域 -->
+    <scroll-view class="scroll-left" scroll-y style="height:{{windowHeight}}px;">
+      <van-badge-group active="{{ active }}" bind:change="onChange">
+        <van-badge title="{{item.cat_name}}" wx:for="{{cateList}}" wx:key="index"/>
+      </van-badge-group>
+    </scroll-view>
+    <!-- 右侧二、三级分类区域 -->
+    <scroll-view class="scroll-right" scroll-y style="height:{{windowHeight}}px;">
+      <block wx:for="{{secondData}}" wx:key="index">
+        <van-row>
+          <van-col span="24" style="text-align:center">
+            <text class="cate-title" space="ensp">/ {{item.cat_name}} /</text>
+            <van-row>
+              <block wx:for="{{item.children}}" wx:key="index">
+                <van-col span="8" class="cell" @tap="goGoodList({{item.cat_id}})">
+                  <image class="thumbImg" src="{{item.cat_icon}}">
+                  <view class="thumbTitle">{{item.cat_name}}</view>
+                </van-col>
+              </block>
+            </van-row>
+          </van-col>
+        </van-row>
+      </block>
+    </scroll-view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+import mix from '@/mixins/tabs/category.js'
+export default class extends wepy.page {
+  mixins = [mix]
+}
+</script>
+<style lang="less">
+.cates-container {
+  display: flex;
+}
+.scroll-left {
+  width: 85px;
+}
+.scroll-right {
+  .cate-title {
+    display: inline-block;
+    font-size: 26rpx;
+    font-weight: bold;
+    margin: 30rpx 0;
+  }
+  .cell {
+    text-align: center;
+    .thumbImg {
+      width: 120rpx;
+      height: 120rpx;
+    }
+    .thumbTitle {
+      text-align: center;
+      font-size: 24rpx;
+    }
+  }
+}
+</style>

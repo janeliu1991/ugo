@@ -1,0 +1,41 @@
+<template>
+  <view>
+    <!-- 标签区域 -->
+    <van-tabs active="{{ active }}" bind:change="tabChange">
+      <block wx:for="{{orderStatuLsit}}" wx:key="index">
+        <view class="spe-line"></view>
+        <van-tab title="{{item.title}}">
+          <block wx:for="{{item.list}}" wx:for-item="subItem" wx:key="subItem">
+            <van-panel title="{{'订单号：'+subItem}}" use-footer-slot>
+              <block wx:for="subItem.order_detail" wx:key="index">
+                <van-card num="{{item.count}}" price="{{item.price}}" desc="描述信息" title="{{item.name}}" thumb="{{ item.pic }}"/>
+              </block>
+              <van-cell value="共{{subItem.total_count}}件商品，订单金额￥{{subItem.order_price}}"/>
+              <view slot="footer">
+                <van-button size="small" type="danger">取消订单</van-button>
+                <van-button size="small" type="primary">支付订单</van-button>
+              </view>
+            </van-panel>
+          </block>
+        </van-tab>
+      </block>
+    </van-tabs>
+    <!-- 订单列表区域 -->
+    <view></view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+import mix from '@/mixins/orderList.js'
+export default class extends wepy.page {
+  config = {
+    navigationBarTitleText: '订单列表'
+  }
+  mixins = [mix]
+}
+</script>
+<style lang="less" scoped>
+.spe-line {
+  border-bottom: 15rpx solid #eee;
+}
+</style>

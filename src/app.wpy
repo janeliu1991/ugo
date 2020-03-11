@@ -1,0 +1,211 @@
+<style lang="less">
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+import '@/baseAPI.js'
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/tabs/home',
+      'pages/tabs/category',
+      'pages/tabs/search',
+      'pages/tabs/cart',
+      'pages/tabs/my',
+      'pages/goods_detail/main',
+      'pages/goods_list',
+      'pages/order',
+      'pages/orderList'
+    ],
+    window: {
+      backgroundTextStyle: 'dark',
+      navigationBarBackgroundColor: '#d81e06',
+      navigationBarTitleText: 'ugo',
+      navigationBarTextStyle: 'white'
+    },
+    tabBar: {
+      // 选中的文本路径
+      selectedColor: '#d81e06',
+      // 所有tabBar的配置
+      list: [
+        {
+          pagePath: 'pages/tabs/home',
+          text: '首页',
+          iconPath: '/assets/icons/home.png',
+          selectedIconPath: '/assets/icons/home-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/category',
+          text: '分类',
+          iconPath: '/assets/icons/cates.png',
+          selectedIconPath: '/assets/icons/cates-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/search',
+          text: '搜索',
+          iconPath: '/assets/icons/search.png',
+          selectedIconPath: '/assets/icons/search-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/cart',
+          text: '购物车',
+          iconPath: '/assets/icons/cart.png',
+          selectedIconPath: '/assets/icons/cart-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/my',
+          text: '我的',
+          iconPath: '/assets/icons/my.png',
+          selectedIconPath: '/assets/icons/my-active.png'
+        }
+      ]
+    },
+    usingComponents: {
+      // 徽章组件
+      'van-badge': './assets/vant/badge/index',
+      'van-badge-group': './assets/vant/badge-group/index',
+      // 布局相关组件
+      'van-row': './assets/vant/row/index',
+      'van-col': './assets/vant/col/index',
+      // 搜索框组件
+      'van-search': './assets/vant/search/index',
+      // 单元格组件
+      'van-cell': './assets/vant/cell/index',
+      'van-cell-group': './assets/vant/cell-group/index',
+      // 图标组件
+      'van-icon': './assets/vant/icon/index',
+      'van-tag': './assets/vant/tag/index',
+      // 商品卡片
+      'van-card': './assets/vant/card/index',
+      // tab切换
+      'van-tab': './assets/vant/tab/index',
+      'van-tabs': './assets/vant/tabs/index',
+      // 把html代码转换为wxml代码的插件
+      wxparse: './assets/wxparse/wxparse',
+      // 商品导航区
+      'van-goods-action': './assets/vant/goods-action/index',
+      'van-goods-action-icon': './assets/vant/goods-action-icon/index',
+      'van-goods-action-button': './assets/vant/goods-action-button/index',
+      // 购物车计步区
+      'van-stepper': './assets/vant/stepper/index',
+      // 复选框区
+      'van-checkbox': './assets/vant/checkbox/index',
+      // 滑动删除标签
+      'van-swipe-cell': './assets/vant/swipe-cell/index',
+      // 提交订单
+      'van-submit-bar': './assets/vant/submit-bar/index',
+      // 按钮组件
+      'van-button': './assets/vant/button/index',
+      // 订单列表-panel面板
+      'van-panel': './assets/vant/panel/index'
+    }
+  }
+  // 存储全局共享的数据
+  // 只需通过this.$parent.globalData就可拿到数据
+  globalData = {
+    // userInfo: null,
+    cart: [],
+    selectedNum: 0
+  }
+  addGoodsToCart(goods) {
+    const i = this.globalData.cart.findIndex(x => x.goods_id === goods.goods_id)
+    if (i !== -1) {
+      this.globalData.cart[i].goods_acount++
+      this.saveCartToStorage()
+      return
+    }
+    const info = {
+      goods_id: goods.goods_id,
+      goods_name: goods.goods_name,
+      goods_price: goods.goods_price,
+      goods_pic: goods.goods_small_logo,
+      goods_acount: 1,
+      isChecked: true
+    }
+    this.globalData.cart.push(info)
+    this.saveCartToStorage()
+  }
+  updateGoodsCount(id, count) {
+    let i = this.globalData.cart.findIndex(item => item.goods_id === id)
+    if (i !== -1) {
+      this.globalData.cart[i].goods_acount = count
+      this.saveCartToStorage()
+    }
+  }
+  changeGoodsChecked(id, status) {
+    let i = this.globalData.cart.findIndex(item => item.goods_id === id)
+    if (i !== -1) {
+      this.globalData.cart[i].isChecked = status
+      this.saveCartToStorage()
+    }
+  }
+  deleteCartGoods(id) {
+    let i = this.globalData.cart.findIndex(item => item.goods_id === id)
+    if (i !== -1) {
+      this.globalData.cart.splice(i, 1)
+      this.saveCartToStorage()
+    }
+  }
+  changeCheckedAll(status) {
+    for (let item of this.globalData.cart) {
+      item.isChecked = status
+    }
+    this.saveCartToStorage()
+  }
+  saveCartToStorage() {
+    wepy.setStorageSync('cart', this.globalData.cart)
+    this.renderSelectedNUm()
+  }
+  async renderSelectedNUm() {
+    let num = 0
+    for (let item of this.globalData.cart) {
+      if (item.isChecked) {
+        num += item.goods_acount
+      }
+    }
+    this.globalData.selectedNum = num
+    const res = await wepy
+      .setTabBarBadge({
+        index: 3,
+        text: num + ''
+      })
+      .catch(err => err)
+    if (res.errMsg !== 'setTabBarBadge:ok') {
+    }
+  }
+  constructor() {
+    super()
+    this.use('requestfix')
+    //  可以为异步请求开启promise对象，可以使用asycn  await
+    this.use('promisify')
+    this.intercept('request', {
+      // 发送请求时的回调函数
+      config(p) {
+        wepy.showLoading({
+          title: '数据加载中...'
+        })
+        p.header = { Authorization: wepy.getStorageSync('token') }
+        console.log(p)
+        return p
+      },
+      // 请求成功后的回到函数
+      success(p) {
+        return p
+      },
+      // 请求失败是的回调函数
+      fail(p) {
+        return p
+      },
+      // 请求完成时的回调函数
+      complete(p) {
+        wepy.hideLoading()
+      }
+    })
+  }
+  onLaunch() {
+    this.globalData.cart = wepy.getStorageSync('cart') || []
+    this.renderSelectedNUm()
+  }
+}
+</script>
